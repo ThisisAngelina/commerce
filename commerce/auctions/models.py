@@ -16,6 +16,7 @@ class Category(models.Model):
 
 class Listing(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listings") #every category can have multuple listings. Every listing has its category
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="listings", null=True)
     title = models.CharField(max_length=200)     
     description = models.CharField(max_length=1000, validators=[MinLengthValidator(20)]) # asking users to input a listing description that is at least 100 characters long
     starting_bid = models.FloatField(validators=[MinValueValidator(0.01)])

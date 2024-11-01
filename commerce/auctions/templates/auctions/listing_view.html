@@ -1,0 +1,48 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+<h1>Listing: {{listing.title}}</h1>
+
+<!-- first button -->
+
+<button class="btn btn-warning mb-5"> <a href="#"> Add to wishlist</a></button>
+
+
+<!-- listing's image -->
+<div>
+ <img width="auto" height="500" class="mb-5" src="{{ listing.image_url }}"> 
+</div>
+
+
+<!-- listing's current bid, previous bids and the user's bid-->
+ <div>
+
+ <!-- if there are no bids for the item, dispay the initial bid. Otherwise, display the highes bid-->
+{% if bids|length == 0 %}
+<h2>$ {{ listing.starting_bid }} </h2>
+{% else %}
+<h2>$ {{ max_bid.bid }} </h2>
+{% endif %}
+<p> {{ bids|length }} bids so far. Make your bid:</p>
+
+
+<form action="{% url 'bid' listing.pk %}" method="post">
+    <input type="number" name="bid" placeholder="Bid">
+    <input class="btn btn-primary" type="submit" value="Place Bid">
+</form>
+
+ <!-- present the user with an error if their bid is lower than the current max bid-->
+{% if message %}
+ <div class="alert alert-danger">{{ message }}</div>
+{% endif %}
+
+<!-- listing's details-->
+<div>
+    <p class="font-weight-bold"> Listed by: {{listing.user.username}} </p>
+    <p class="font-weight-bold"> Category: {{listing.category.name}} </p> 
+    <p class="font-weight-bold"> Item description: </p> 
+    <p>  {{ listing.description }} </p> 
+</div>
+
+
+{% endblock %}

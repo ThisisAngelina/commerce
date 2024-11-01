@@ -3,10 +3,16 @@
 {% block body %}
 <h1>All listings</h1>
 <a href="{% url 'listing_create' %}" class="btn btn-primary mt-3 mb-3">Add a new listing</a>
-<ul class="mt-5">
-    {% for listing in listings %}
-        <li class="mb-3"> <img width="auto" height="100" src="{{ listing.image_url }}"> {{ listing.category }}: {{ listing.title}}, starting at ${{ listing.starting_bid }} <a class="link-primary" href="#">View</a></li>
-    {% endfor %}
-</ul>
+{% for listing in listings %}
+<div class="mb-5">
+    
+    <col>
+       <img width="auto" height="200" src="{{ listing.image_url }}">
+    </col>
+    <col>
+       <p>{{ listing.category }}: {{ listing.title}}, starting at ${{ listing.starting_bid }} <a class="link-primary" href="{% url 'listing_view' listing.pk %}">View</a></p>
+    </col>
+</div>
 
+{% endfor %}
 {% endblock %}
