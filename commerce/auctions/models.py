@@ -17,7 +17,7 @@ class Category(models.Model):
 class Listing(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listings") #every category can have multuple listings. Every listing has its category
     title = models.CharField(max_length=200)     
-    description = models.CharField(max_length=1000, validators=[MinLengthValidator(100)]) # asking users to input a listing description that is at least 100 characters long
+    description = models.CharField(max_length=1000, validators=[MinLengthValidator(20)]) # asking users to input a listing description that is at least 100 characters long
     starting_bid = models.FloatField(validators=[MinValueValidator(0.01)])
     image_url = models.URLField(max_length=200, blank = True, null = True) #the url can be blank
     open =  models.BooleanField(default = True) #the standard status for a listing is "open"

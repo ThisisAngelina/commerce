@@ -3,13 +3,13 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
+from django.views.generic.edit import CreateView
+from django.urls import reverse_lazy
 
-from .models import User
-
-
-def index(request):
-    return render(request, "auctions/index.html")
-
+from .models import *
+from .forms import *
 
 def login_view(request):
     if request.method == "POST":
@@ -61,3 +61,19 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+    
+
+# let users create new listings
+class ListingCreateView(LoginRequiredMixin, CreateView):
+    model = Listing
+    form_class = ListingForm
+    template_name = 'auctions/listing_create.html'
+    success_url = reverse_lazy('index') 
+
+
+# let users view all listings
+class ListingListView(LoginRequiredMixin, ListView):
+    model = Listing
+    template_name = 'auctions/index.html'
+    context_object_name = 'listings'
+

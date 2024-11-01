@@ -1,7 +1,12 @@
-{% extends "auctions/layout.html" %}
+{% extends 'auctions/layout.html' %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+<h1>All listings</h1>
+<a href="{% url 'listing_create' %}" class="btn btn-primary mt-3 mb-3">Add a new listing</a>
+<ul class="mt-5">
+    {% for listing in listings %}
+        <li class="mb-3"> <img width="auto" height="100" src="{{ listing.image_url }}"> {{ listing.category }}: {{ listing.title}}, starting at ${{ listing.starting_bid }} <a class="link-primary" href="#">View</a></li>
+    {% endfor %}
+</ul>
 
-    TODO
 {% endblock %}
