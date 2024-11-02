@@ -117,6 +117,10 @@ class ListingDetailView(LoginRequiredMixin, DetailView):
         # context for whether the listing is already closed 
         if requested_listing.open == False:
             context['closed'] = True #display a note on the listing_view page that the listing is closed 
+        
+        # context for whether the winner of the auction is the signed-in user 
+        if requested_listing.winner == user:
+            context['you_won'] = True
 
         return context 
 

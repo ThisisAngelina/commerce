@@ -12,6 +12,9 @@
 <h1>{{listing.title}}</h1>
 {% if closed %}
 <h5 style="color:grey;"> this listing is closed </h5>
+    {% if you_won%}
+    <h5 style="color:green;"> You won this auction! Congratulations!</h5>
+    {% endif %}
 {% endif %}
 
 <!-- watchlist and close_listing buttons -->
