@@ -122,6 +122,9 @@ class ListingDetailView(LoginRequiredMixin, DetailView):
         if requested_listing.winner == user:
             context['you_won'] = True
 
+        # context fo the comments 
+        context['comments'] = Comment.objects.filter(listing=requested_listing)
+
         return context 
 
 
@@ -201,8 +204,24 @@ def close_listing(request, listing_id):
         messages.success(request, "The listing was successfully closed")
         return redirect('listing_view', pk=listing_id)
 
+# allow the user to leave a comment under a listing
+@login_required
+def comment(request, listing_id):
 
-        
+    if request.method == 'POST':
+        # get hold of the listing object 
+        listing = Listing.objects.get(pk=listing_id)
+        # get hold of the comment
+        comment = request.POST.get('comment')
+        if not comment:
+            messages.warning(request, "Ooops, please write somethig to save your comment!")
+            return redirect('listing_view', pk=listing_id)
+        else:
+            new_comment = Comment.objects.create(user=request.user, listing=listing, comment=comment)
+            new_comment.save()
+            return redirect('listing_view', pk=listing_id)
+    else:
+        return redirect('listing_view', pk=listing_id)
 
 
 

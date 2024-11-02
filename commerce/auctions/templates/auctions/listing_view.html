@@ -35,7 +35,7 @@
 
 <!-- listing's image -->
 <div>
- <img width="auto" height="500" class="mb-5" src="{{ listing.image_url }}"> 
+ <img width="auto" height="400" class="mb-5" src="{{ listing.image_url }}"> 
 </div>
 
 
@@ -65,6 +65,22 @@
     <p class="font-weight-bold"> Item description: </p> 
     <p>  {{ listing.description }} </p> 
 </div>
+
+<!-- comments-->
+<div>
+    <p style="font-weight: bold">Comments:</p>
+    {% for comment in comments %}
+    <p><span style="text-decoration: underline;">{{ comment.user }}</span>: {{ comment.comment }}</p>
+    {% endfor %}
+</div>
+
+<!-- add a comment-->
+
+<form action="{% url 'comment' listing.pk %}" method="post">
+    {% csrf_token %}
+    <input type="text" name="comment" placeholder="Your comment">
+    <input class="btn btn-link" type="submit" value="Leave a comment">
+</form>
 
 
 {% endblock %}
