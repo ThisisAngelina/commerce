@@ -10,6 +10,7 @@ from django.views.generic.detail import DetailView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Max
+from django.http import Http404
 
 from .models import *
 from .forms import *
@@ -98,12 +99,9 @@ class ListingDetailView(LoginRequiredMixin, DetailView):
 def place_bid(request, listing_id):
 
     if request.method == 'POST':
-        print("the authenticated user is ", request.user)
-        print("the form was submitted")
-
+    
     # get hold of the listing object 
         listing = Listing.objects.get(pk=listing_id)
-        print("the requested listing object", listing)
 
     # get hold of the bid amount 
         bid = float(request.POST.get('bid'))
@@ -111,23 +109,33 @@ def place_bid(request, listing_id):
             messages.warning("Ooops, please input a valid amount!")
             return redirect('listing_view', pk=listing_id)
         else:
-            print("the bid placed is ", bid)
-
             # get hold of the max bid for the listing
             max_bid = Bid.objects.filter(listing=listing).aggregate(Max('bid'))['bid__max'] or listing.starting_bid #getting the max bid or the starting bid, if no bids exist
-            print("the current max bid is ", max_bid)        
             #register the bid only if it surpasses the max bid for the listing
             if bid > max_bid:
                 new_bid=Bid.objects.create(user=request.user, listing=listing, bid=bid) #the user object is accessible via request.user 
-                print("the newly created Bid object is ", new_bid)
                 new_bid.save()
-                messages.success(request, "Your bid was successfully placed") #TODO figure out why the message appears when the user first visits the page
+                messages.success(request, "Your bid was successfully placed") 
                 return redirect('listing_view', pk=listing_id)
             else:
                 messages.warning(request, 'Oops, your bid is smaller than the maximum existing bid for this listing! Increase your bid!')
-                print("Oops, your bid is smaller than the maximum existing bid for this listing!")
                 return redirect('listing_view', pk=listing_id)
     else:
         return redirect('listing_view', pk=listing_id)
+    
+#let users add the listing to their watchlist from the button on the listing_view page
+def add_to_watchlist(request, listing_id):
+    listing = Listing.objects.get(pk=listing_id)
+    try:
+        new_watchlisted = Watchlist.objects.create(user=request.user, listing=listing)
+        new_watchlisted.save()
+        messages.success(request, "Item added to your watchlist")
+        return redirect('listing_view', pk=listing_id)
+    except:
+        messages.warning(request, "Oops, this item is already in your watchlist")
+        return redirect('listing_view', pk=listing_id)
+                
+
+
     
 

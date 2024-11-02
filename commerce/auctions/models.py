@@ -29,12 +29,12 @@ class Listing(models.Model):
 
 
 
-class WishList(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="wishlist")
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="wishlisted")
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="watchlist")
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="watchlisted")
 
     class Meta:
-        unique_together = ("user", "listing") #make sure a user cannot have duplicate listings in their wishlist 
+        unique_together = ("user", "listing") #make sure a user cannot have duplicate listings in their watchlist
 
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids")
