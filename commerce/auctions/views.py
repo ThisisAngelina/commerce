@@ -11,6 +11,8 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.db.models import Max
 from django.http import Http404
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import *
 from .forms import *
@@ -91,11 +93,27 @@ class ListingDetailView(LoginRequiredMixin, DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
         requested_listing = self.kwargs.get('pk')
+
+        #bids-related context
         context['bids'] = Bid.objects.filter(listing=requested_listing)
         context['max_bid'] = Bid.objects.filter(listing=requested_listing).aggregate(Max('bid'))['bid__max']
+
+        #watchlist-related context
+
+        #check if the listing is already in the user's watchlist
+        try:
+            Watchlist.objects.get(user=user, listing=requested_listing)
+            context['watchlist_button'] = "Remove from" #if the item is already in the user's watchlist, make it impossible to add to the watchlist
+        except ObjectDoesNotExist:
+            context['watchlist_button'] = "Add to"
+
         return context 
-    
+
+
+# let users place bids for items
+@login_required   
 def place_bid(request, listing_id):
 
     if request.method == 'POST':
@@ -123,18 +141,26 @@ def place_bid(request, listing_id):
     else:
         return redirect('listing_view', pk=listing_id)
     
-#let users add the listing to their watchlist from the button on the listing_view page
-def add_to_watchlist(request, listing_id):
+#let users add the listing to their watchlist from the button on the listing_view page.
+#TODO If the item is already on the watchlist, the user should be able to remove it.
+@login_required
+def add_to_remove_from_watchlist(request, listing_id):
+
+    # define which listing the user is trying to perform the action for
     listing = Listing.objects.get(pk=listing_id)
-    try:
-        new_watchlisted = Watchlist.objects.create(user=request.user, listing=listing)
-        new_watchlisted.save()
-        messages.success(request, "Item added to your watchlist")
-        return redirect('listing_view', pk=listing_id)
-    except:
-        messages.warning(request, "Oops, this item is already in your watchlist")
-        return redirect('listing_view', pk=listing_id)
-                
+
+    # check if the listing is already in the user's watchlist
+    watchlist_entry, created = Watchlist.objects.get_or_create(user=request.user, listing=listing)
+
+    if created:
+        # item was not in the watchlist and has been added
+        messages.success(request, "The item was added to your watchlist")
+    else:
+        # item was already in the watchlist, so remove it
+        watchlist_entry.delete()
+        messages.success(request, "The item was removed from your watchlist")
+
+    return redirect('listing_view', pk=listing_id)
 
 
     
