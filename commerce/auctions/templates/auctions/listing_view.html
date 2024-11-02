@@ -1,6 +1,14 @@
 {% extends 'auctions/layout.html' %}
 
 {% block body %}
+
+ <!-- present the user with an error if their bid is lower than the current max bid-->
+ {% if messages %}
+   {% for message in messages %}
+     <p class="alert alert-{{ message.tags }}">{{ message }}<p>
+   {% endfor %}
+{% endif %}
+
 <h1>Listing: {{listing.title}}</h1>
 
 <!-- first button -->
@@ -21,20 +29,17 @@
 {% if bids|length == 0 %}
 <h2>$ {{ listing.starting_bid }} </h2>
 {% else %}
-<h2>$ {{ max_bid.bid }} </h2>
+<h2>$ {{ max_bid }} </h2>
 {% endif %}
 <p> {{ bids|length }} bids so far. Make your bid:</p>
 
 
 <form action="{% url 'bid' listing.pk %}" method="post">
+    {% csrf_token %}
     <input type="number" name="bid" placeholder="Bid">
     <input class="btn btn-primary" type="submit" value="Place Bid">
 </form>
 
- <!-- present the user with an error if their bid is lower than the current max bid-->
-{% if message %}
- <div class="alert alert-danger">{{ message }}</div>
-{% endif %}
 
 <!-- listing's details-->
 <div>
