@@ -39,7 +39,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("index"))
+    return HttpResponseRedirect(reverse("login"))
 
 
 def register(request):
@@ -94,7 +94,8 @@ class ListingDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
-        requested_listing = self.kwargs.get('pk')
+        requested_listing_id = self.kwargs.get('pk')
+        requested_listing = Listing.objects.get(pk=requested_listing_id)
 
         #bids-related context
         context['bids'] = Bid.objects.filter(listing=requested_listing)
@@ -108,6 +109,14 @@ class ListingDetailView(LoginRequiredMixin, DetailView):
             context['watchlist_button'] = "Remove from" #if the item is already in the user's watchlist, make it impossible to add to the watchlist
         except ObjectDoesNotExist:
             context['watchlist_button'] = "Add to"
+        
+        # 'close this listing' button-related context
+        if requested_listing.user == user:
+            context['can_close'] = True #needed so that the 'close this listing' button is displayed only if the listing's author is the signed in user herself
+
+        # context for whether the listing is already closed 
+        if requested_listing.open == False:
+            context['closed'] = True #display a note on the listing_view page that the listing is closed 
 
         return context 
 
@@ -161,6 +170,36 @@ def add_to_remove_from_watchlist(request, listing_id):
         messages.success(request, "The item was removed from your watchlist")
 
     return redirect('listing_view', pk=listing_id)
+
+
+# allow the creator of the listing to close the listing
+@login_required
+def close_listing(request, listing_id):
+    
+    listing = Listing.objects.get(pk=listing_id)
+    listing.open = False 
+    listing.save()
+    
+    #define the winner of the auction: the person with the maximum bid 
+    try:
+        purchaser = Bid.objects.filter(listing=listing).order_by('-bid').first().user
+        sold_for = Bid.objects.filter(listing=listing).order_by('-bid').first().bid
+        #save this information in the listing's Listing model object
+        listing.winner = purchaser 
+        listing.sold_for = sold_for
+        listing.save()
+        messages.success(request, f"The listing was successfully closed. The winner is  {purchaser.username}")
+        return redirect('listing_view', pk=listing_id)
+    
+    except ObjectDoesNotExist: #if there were no bids for the listing
+        listing.winner = None
+        listing.save()
+        messages.success(request, "The listing was successfully closed")
+        return redirect('listing_view', pk=listing_id)
+
+
+        
+
 
 
     

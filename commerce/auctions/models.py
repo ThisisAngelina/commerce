@@ -23,7 +23,9 @@ class Listing(models.Model):
     image_url = models.URLField(max_length=200, blank = True, null = True) #the url can be blank
     open =  models.BooleanField(default = True) #the standard status for a listing is "open"
     created_at =models.DateTimeField(auto_now_add=True) #automatically add the timestamp to the listing - useful to sort the listings chronologically for the display
-    
+    winner = models.ForeignKey(User, related_name="purchases", on_delete=models.SET_NULL, null=True, blank=True) #if the acquiror deletes tjeir account, this field is set to Null
+    sold_for = models.FloatField(null=True, blank=True)
+
     def __str__(self):
         return f"{self.title} starting at {self.starting_bid}"
 

@@ -10,6 +10,7 @@ urlpatterns = [
     path('listing/<int:pk>', views.ListingDetailView.as_view(), name='listing_view'),
     path('bid/<int:listing_id>', views.place_bid, name='bid'),
     path('watch/<int:listing_id>', views.add_to_remove_from_watchlist, name='add_to_remove_from_watchlist'),
+    path('close/<int:listing_id>', views.close_listing, name='close_listing'),
 
     #add name='bid' url for bidding
     

@@ -9,11 +9,25 @@
    {% endfor %}
 {% endif %}
 
-<h1>Listing: {{listing.title}}</h1>
+<h1>{{listing.title}}</h1>
+{% if closed %}
+<h5 style="color:grey;"> this listing is closed </h5>
+{% endif %}
 
-<!-- first button -->
+<!-- watchlist and close_listing buttons -->
 
-<button class="btn btn-warning mb-5"> <a href="{% url 'add_to_remove_from_watchlist' listing.pk %}"> {{ watchlist_button }} watchlist</a></button>
+<div>
+    {% if can_close %}
+        {% if not closed %}
+        <a href="{% url 'close_listing' listing.pk %}" class="btn btn-secondary mb-3">Close this listing</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'add_to_remove_from_watchlist' listing.pk %}" class="btn btn-warning mb-2" style="background-color: lightblue;">
+            {{ watchlist_button|safe }} watchlist
+        </a>
+    {% endif %}
+</div>
+
 
 
 <!-- listing's image -->

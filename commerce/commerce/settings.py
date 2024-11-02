@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# settings.py
+#LOGIN_URL = 'login'
 
 # Application definition
 
