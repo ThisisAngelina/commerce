@@ -187,21 +187,24 @@ def close_listing(request, listing_id):
     listing.save()
     
     #define the winner of the auction: the person with the maximum bid 
-    try:
-        purchaser = Bid.objects.filter(listing=listing).order_by('-bid').first().user
-        sold_for = Bid.objects.filter(listing=listing).order_by('-bid').first().bid
+    highest_bid = Bid.objects.filter(listing=listing).order_by('-bid').first()
+
+    if highest_bid is not None:
+        purchaser = highest_bid.user
+        sold_for = highest_bid.bid
         #save this information in the listing's Listing model object
         listing.winner = purchaser 
         listing.sold_for = sold_for
         listing.save()
         messages.success(request, f"The listing was successfully closed. The winner is  {purchaser.username}")
-        return redirect('listing_view', pk=listing_id)
     
-    except ObjectDoesNotExist: #if there were no bids for the listing
+    else: #if there were no bids for the listing
         listing.winner = None
+        listing.sold_for = None
         listing.save()
         messages.success(request, "The listing was successfully closed")
-        return redirect('listing_view', pk=listing_id)
+    
+    return redirect('listing_view', pk=listing_id)
 
 # allow the user to leave a comment under a listing
 @login_required
@@ -249,7 +252,7 @@ class ListingCategoryListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # access only the items of the requested category
         category_id = self.kwargs.get('category_id')
-        return Listing.objects.filter(category=category_id)
+        return Listing.objects.filter(category=category_id, open=True)
   
         
     def get_context_data(self, **kwargs):
