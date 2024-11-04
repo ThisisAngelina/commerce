@@ -223,7 +223,18 @@ def comment(request, listing_id):
     else:
         return redirect('listing_view', pk=listing_id)
 
+# let users see their watchlist list 
+#TODO to work on this function
+class WatchlistListView(LoginRequiredMixin, ListView):
+    model = Watchlist
+    template_name = 'auctions/watchlist.html'
+    context_object_name = 'listings'
 
+    def get_queryset(self):
+        # access only the watchlist items of the user making the request 
+        user = self.request.user
+        return Watchlist.objects.filter(user=user)
 
+    
     
 

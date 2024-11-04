@@ -2,7 +2,7 @@
 
 {% block body %}
 
- <!-- present the user with an error if their bid is lower than the current max bid-->
+ <!-- present the user with the various erorr (danger) and success messages (alerts)-->
  {% if messages %}
    {% for message in messages %}
      <p class="alert alert-{{ message.tags }}">{{ message }}<p>
@@ -70,7 +70,7 @@
 <div>
     <p style="font-weight: bold">Comments:</p>
     {% for comment in comments %}
-    <p><span style="text-decoration: underline;">{{ comment.user }}</span>: {{ comment.comment }}</p>
+    <p><span style="font-style: italic;">{{ comment.user }} wrote</span>: {{ comment.comment }}</p>
     {% endfor %}
 </div>
 
