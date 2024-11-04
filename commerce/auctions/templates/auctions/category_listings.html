@@ -1,0 +1,18 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+<h1>{{ category }} listings: </h1>
+
+{% for listing in listings %}
+<div class="mb-5">
+    
+    <col>
+       <img width="auto" height="200" src="{{ listing.image_url }}">
+    </col>
+    <col>
+       <p>{{ listing.title}}, starting at ${{ listing.starting_bid }} <a class="link-primary" href="{% url 'listing_view' listing.pk %}">View</a></p>
+    </col>
+</div>
+
+{% endfor %}
+{% endblock %}

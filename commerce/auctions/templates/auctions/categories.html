@@ -1,0 +1,18 @@
+{% extends 'auctions/layout.html' %}
+
+{% block body %}
+
+ {% if messages %}
+   {% for message in messages %}
+     <p class="alert alert-{{ message.tags }}">{{ message }}<p>
+   {% endfor %}
+{% endif %}
+
+<h1>Available categories:</h1>
+<ul>
+{% for category in categories %}
+<li><a href="{% url 'category_listings' category.pk %}" class="link-primary">{{ category.name }}</a></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

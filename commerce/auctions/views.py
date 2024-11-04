@@ -158,7 +158,6 @@ def place_bid(request, listing_id):
         return redirect('listing_view', pk=listing_id)
     
 #let users add the listing to their watchlist from the button on the listing_view page.
-#TODO If the item is already on the watchlist, the user should be able to remove it.
 @login_required
 def add_to_remove_from_watchlist(request, listing_id):
 
@@ -224,7 +223,6 @@ def comment(request, listing_id):
         return redirect('listing_view', pk=listing_id)
 
 # let users see their watchlist list 
-#TODO to work on this function
 class WatchlistListView(LoginRequiredMixin, ListView):
     model = Watchlist
     template_name = 'auctions/watchlist.html'
@@ -234,7 +232,28 @@ class WatchlistListView(LoginRequiredMixin, ListView):
         # access only the watchlist items of the user making the request 
         user = self.request.user
         return Watchlist.objects.filter(user=user)
+    
 
-    
-    
+# let users view available categories
+class CategoryListView(LoginRequiredMixin, ListView):
+    model = Category
+    template_name = 'auctions/categories.html'
+    context_object_name = 'categories'    
+
+#let users view listings of a selected category
+class ListingCategoryListView(LoginRequiredMixin, ListView):
+    model = Listing
+    template_name = 'auctions/category_listings.html'
+    context_object_name = 'listings'
+
+    def get_queryset(self):
+        # access only the items of the requested category
+        category_id = self.kwargs.get('category_id')
+        return Listing.objects.filter(category=category_id)
+  
+        
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['category'] = Category.objects.filter(pk=self.kwargs.get('category_id')).first()
+        return context
 
